@@ -1,0 +1,44 @@
+
+exec sp_MSforeachdb ' 
+use [?]
+set QUOTED_IDENTIFIER ON
+declare @t int
+set @t=DB_ID()
+
+ declare @tablename varchar(250)
+declare tablecursor  cursor for
+
+
+with tbname_cte (tb_name) as
+(
+SELECT distinct OBJECT_SCHEMA_NAME([object_id])+''.''+ OBJECT_NAME([object_id]) FROM 
+sys.dm_db_index_physical_stats (@t, NULL, NULL , NULL, NULL) 
+WHERE avg_fragmentation_in_percent >30 and index_id>0 
+
+union all
+
+SELECT schema_name([SCHEMA_ID])+''.''+ tbl.name   FROM sysindexes si
+
+      INNER JOIN sys.tables tbl on si.id = tbl.object_id and indid < 2 where si.rows>10000  
+
+
+)
+
+select tb_name from tbname_cte group by tb_name having COUNT(*)>1
+      OPEN TableCursor
+      FETCH NEXT FROM TableCursor INTO @TableName
+      WHILE @@FETCH_STATUS = 0
+      begin
+	
+      exec(''alter index all on ''+@TableName+'' REBUILD  WITH (  ONLINE = OFF, SORT_IN_TEMPDB = OFF )'' )
+      print '' rebuild ''
+	
+	
+       FETCH NEXT FROM TableCursor INTO  @TableName
+    END
+    CLOSE TableCursor
+    DEALLOCATE TableCursor
+    
+  
+     ' 
+

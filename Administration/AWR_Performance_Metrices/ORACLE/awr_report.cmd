@@ -1,0 +1,1 @@
+sqlplus / as sysdba @c:\perf\a.sql exit

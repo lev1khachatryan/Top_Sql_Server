@@ -1,0 +1,10 @@
+@echo off
+setlocal EnableDelayedExpansion
+set /p input="Do you want to change de war?(y/n)"
+if %input% == y (
+set /p downloadFileLink="Please enter a download file link"
+Powershell.exe -executionpolicy remotesigned -File C:\Users\arthur.rafayelyan\Desktop\GorillazRemoteProjects\remoteStopStartWithChangeFiles4.ps1 803 MRT C:\Users\arthur.rafayelyan\Desktop\GorillazRemoteProjects !downloadFileLink!
+) else if %input% == n (
+Powershell.exe -executionpolicy remotesigned -File   C:\Users\arthur.rafayelyan\Desktop\GorillazRemoteProjects\remoteStopStartWithChangeFiles4.ps1 803 MRT C:\Users\arthur.rafayelyan\Desktop\GorillazRemoteProjects 
+)
+pause 
